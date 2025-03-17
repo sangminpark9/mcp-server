@@ -1,0 +1,30 @@
+services:
+  mcp-server:
+    build: .
+    container_name: mcp-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+      - ./models:/app/models
+    environment:
+      - DEEPSEEK_MODEL_PATH=/app/models/deepseek
+      - LLAMA_MODEL_PATH=/app/models/llama
+      - CONTEXT_STORAGE=memory
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+    # GPU 설정 제거됨
+
+  # Redis 서비스 (선택적)
+  redis:
+    image: redis:alpine
+    container_name: mcp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+    driver: local
